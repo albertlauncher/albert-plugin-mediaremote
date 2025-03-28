@@ -5,5 +5,5 @@
     "license": "MIT",
     "name": "Media player",
     "name[de]": "Mediaplayer",
-    "url": "https://github.com/albertlauncher/plugins/tree/main/mpris",
+    "url": "https://github.com/albertlauncher/albert-plugin-mpris",
 }
