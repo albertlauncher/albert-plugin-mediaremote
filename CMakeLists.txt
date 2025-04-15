@@ -1,20 +1,55 @@
-if(UNIX AND NOT APPLE)
+cmake_minimum_required(VERSION 3.16)
+project(mediaremote VERSION 5.1)
 
-    cmake_minimum_required(VERSION 3.16)
-    project(mpris VERSION 5.1)
+find_package(Albert REQUIRED)
 
-    find_package(Albert REQUIRED)
+albert_plugin(
+    SOURCES
+        src/*.h src/*.cpp include/albert/plugin/*.h
+    INCLUDE
+        INTERFACE include
+        PRIVATE src/ include/albert/plugin
+    QT Widgets
+)
 
-    albert_plugin(QT DBus Widgets)
+if(APPLE)
 
-    # no namespaces (class/namespace conflict)
-    set_source_files_properties(mpris.xml PROPERTIES NO_NAMESPACE ON)
+    target_compile_options(${PROJECT_NAME} PRIVATE
+        "-fobjc-arc")
 
-    # generate code into binary dir
-    qt_add_dbus_interface(DBUS_SRCS mpris.xml mpris)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        "objc"
+        "-framework Foundation"
+        "-F/System/Library/PrivateFrameworks"
+        "-framework MediaRemote"
+    )
 
-    target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR})
+    file(GLOB PLATFORM_SOURCES
+        src/mediaremote/*.h
+        src/mediaremote/*.mm)
 
-    target_sources(${PROJECT_NAME} PRIVATE mpris.xml ${DBUS_SRCS})
+    target_sources(${PROJECT_NAME} PRIVATE ${PLATFORM_SOURCES})
+
+elseif(UNIX)
+
+    # find_package(Qt6 REQUIRED COMPONENTS DBus)
+    # target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::DBus)
+
+    # target_include_directories(${PROJECT_NAME} PRIVATE src/bluez ${PROJECT_BINARY_DIR})
+    # set(DBUS_XML src/bluez/bluez.xml)
+    # set_source_files_properties(${DBUS_XML} PROPERTIES NO_NAMESPACE ON)
+    # set_source_files_properties(${DBUS_XML} PROPERTIES INCLUDE custom_types.h)
+    # qt_add_dbus_interface(DBUS_SRCS ${DBUS_XML} bluez)
+
+    # file(GLOB PLATFORM_SOURCES
+    #     src/bluez/*.h
+    #     src/bluez/*.cpp
+    # )
+    # target_sources(${PROJECT_NAME} PRIVATE
+    #     ${PLATFORM_SOURCES}
+    #     ${PROJECT_BINARY_DIR}/bluez.h
+    #     ${DBUS_XML}
+    #     ${DBUS_SRCS}
+    # )
 
 endif()

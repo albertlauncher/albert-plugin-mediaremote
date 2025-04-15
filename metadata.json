@@ -1,9 +1,9 @@
 {
-    "authors": ["@manuelschneid3r", "@luksfarris"],
-    "description": "Control MPRIS capable media players",
-    "description[de]": "MPRIS-fähige Mediaplayer steuern",
+    "authors": ["@manuelschneid3r"],
+    "description": "Control media players",
+    "description[de]": "Mediaplayer steuern",
     "license": "MIT",
-    "name": "Media player",
-    "name[de]": "Mediaplayer",
-    "url": "https://github.com/albertlauncher/albert-plugin-mpris",
+    "name": "Media player remote",
+    "name[de]": "Mediaplayersteuerung",
+    "url": "https://github.com/albertlauncher/albert-plugin-mediaremote",
 }
