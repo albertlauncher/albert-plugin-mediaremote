@@ -1,20 +1,42 @@
-if(UNIX AND NOT APPLE)
+cmake_minimum_required(VERSION 3.16)
+project(mediaremote VERSION 6.0)
 
-    cmake_minimum_required(VERSION 3.16)
-    project(mpris VERSION 5.1)
+find_package(Albert REQUIRED)
 
-    find_package(Albert REQUIRED)
+albert_plugin(
+    SOURCES
+        src/*.h src/*.cpp src/*.ui include/albert/plugin/*.h
+    INCLUDE
+        INTERFACE include
+        PRIVATE src/ include/albert/plugin
+    QT Widgets
+)
 
-    albert_plugin(QT DBus Widgets)
+if(APPLE)
 
-    # no namespaces (class/namespace conflict)
-    set_source_files_properties(mpris.xml PROPERTIES NO_NAMESPACE ON)
+    albert_plugin_compile_options(PRIVATE "-fobjc-arc")
 
-    # generate code into binary dir
-    qt_add_dbus_interface(DBUS_SRCS mpris.xml mpris)
+    albert_plugin_link(PRIVATE
+        "objc"
+        "-framework Foundation"
+        "-F/System/Library/PrivateFrameworks"
+        "-framework MediaRemote"
+    )
 
-    target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_BINARY_DIR})
+    albert_plugin_sources(
+        src/mediaremote/*.h
+        src/mediaremote/*.mm
+    )
 
-    target_sources(${PROJECT_NAME} PRIVATE mpris.xml ${DBUS_SRCS})
+elseif(UNIX)
+
+    albert_plugin_link_qt(DBus VERSION 6.0 REQUIRED)
+
+    albert_plugin_dbus_interface(XML "src/mpris/mpris.xml")
+
+    albert_plugin_sources(
+        src/mpris/*.cpp
+        src/mpris/*.h
+    )
 
 endif()

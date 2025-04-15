@@ -1,76 +1,112 @@
 // Copyright (c) 2017-2024 Manuel Schneider
 
+// https://github.com/khangthk/SketchyBar/blob/5b7d0e07cf41ae8413393b1bb8f5c184a6615695/src/media.m
+
+#include "mediaremote.h"
 #include "plugin.h"
-#include "albert/pluginloader.h"
-#include "albert/pluginmetadata.h"
-#include "ui_configwidget.h"
+#include <Foundation/Foundation.h>
 #include <albert/logging.h>
-#include <albert/matcher.h>
-#include <albert/standarditem.h>
-ALBERT_LOGGING_CATEGORY("mediaplayerremote")
+#include <objc/runtime.h>
+#include <AppKit/AppKit.h>
 using namespace albert;
 using namespace std;
+#if  ! __has_feature(objc_arc)
+#error This file must be compiled with ARC.
+#endif
 
-namespace albert::plugin::mediaremote {
-IPlugin::~IPlugin() = default;
-}
+struct Plugin::Private {};
 
-QString Plugin::id() const { return loader().metaData().id; }
-
-QString Plugin::name() const { return loader().metaData().name; }
-
-QString Plugin::description() const { return loader().metaData().description; }
-
-vector<Extension *> Plugin::extensions() { return {this}; }
-
-static inline shared_ptr<Item> makeItem(const QString &cmd,
-                                        const QString &player,
-                                        const QStringList &icon_urls,
-                                        function<void()> &&action)
+static QString playerNamefromPid(int pid)
 {
-    return StandardItem::make(cmd,
-                              cmd,
-                              player,
-                              icon_urls,
-                              {{ cmd, cmd, ::move(action)}});
+    if (pid)
+        if (NSRunningApplication *app =
+            [NSRunningApplication runningApplicationWithProcessIdentifier:pid];
+            app)
+            return QString::fromNSString(app.localizedName);
+    return {};
 }
 
-vector<RankItem> Plugin::handleGlobalQuery(const Query &query)
+Plugin::Plugin() : d(make_unique<Private>())
 {
-    vector<RankItem> results;
-    Matcher matcher(query);
+    MRMediaRemoteRegisterForNowPlayingNotifications(dispatch_get_main_queue());
 
-    if (auto m = matcher.match(strings.next, ui_strings.next, player_); m && canGoNext())
-        results.emplace_back(
-            makeItem(ui_strings.next, player_, {"qsp:SP_MediaSkipForward"}, [this]{next();}), m);
+    // Initialize is_playing_
+    MRMediaRemoteGetNowPlayingApplicationIsPlaying(
+        dispatch_get_main_queue(), ^(Boolean isPlaying) { is_playing_ = isPlaying; });
 
-    if (auto m = matcher.match(strings.previous, ui_strings.previous, player_); m && canGoPrevious())
-        results.emplace_back(
-            makeItem(ui_strings.previous, player_, {"qsp:SP_MediaSkipBackward"}, [this]{previous();}), m);
+    // Watch is_playing_
+    [[NSNotificationCenter defaultCenter]
+        addObserverForName:kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification
+                    object:nil
+                     queue:[NSOperationQueue mainQueue]
+                usingBlock:^(NSNotification *note) {
+                    bool v = [note.userInfo[kMRMediaRemoteNowPlayingApplicationIsPlayingUserInfoKey]
+                        boolValue];
+                    if (is_playing_ != v)
+                    {
+                        is_playing_ = v;
+                        DEBG << "is_playing changed:" << v;
+                        emit isPlayingChanged(v);
+                    }
+                }];
 
-    if (isPlaying())
-    {
-        if (auto m = matcher.match(strings.pause, ui_strings.pause, player_); m && canPause())
-            results.emplace_back(
-                makeItem(ui_strings.pause, player_, {"qsp:SP_MediaPause"}, [this]{pause();}), m);
-    }
-    else
-    {
-        if (auto m = matcher.match(strings.play, ui_strings.play, player_); m && canPlay())
-            results.emplace_back(
-                makeItem(ui_strings.play, player_, {"qsp:SP_MediaPlay"}, [this]{play();}), m);
-    }
+    // Initialize player_name_
+    MRMediaRemoteGetNowPlayingApplicationPID(dispatch_get_main_queue(),
+                                             ^(int pid) { player_ = playerNamefromPid(pid); });
 
-    return results;
+    // Watch player_name_
+    [[NSNotificationCenter defaultCenter]
+        addObserverForName:kMRMediaRemoteNowPlayingApplicationDidChangeNotification
+                    object:nil
+                     queue:[NSOperationQueue mainQueue]
+                usingBlock:^(NSNotification *note) {
+                    int pid = [note.userInfo[kMRMediaRemoteNowPlayingApplicationPIDUserInfoKey]
+                        intValue];
+                    auto name = playerNamefromPid(pid);
+                    if (player_ != name)
+                    {
+                        player_ = name;
+                        DEBG << "player_name changed:" << name;
+                        emit playerChanged(name);
+                    }
+                }];
 }
 
-QWidget *Plugin::buildConfigWidget()
-{
-    auto *w = new QWidget();
-    Ui::ConfigWidget ui;
-    ui.setupUi(w);
-    return w;
-}
+Plugin::~Plugin() {}
+
+QString Plugin::player() { return player_; }
+
+bool Plugin::isPlaying() { return is_playing_; }
+
+// void Plugin::playPause() { MRMediaRemoteSendCommand(kMRTogglePlayPause, nil); }
+
+void Plugin::play() { MRMediaRemoteSendCommand(kMRPlay, nil); }
+
+void Plugin::pause() { MRMediaRemoteSendCommand(kMRPause, nil); }
+
+void Plugin::next() { MRMediaRemoteSendCommand(kMRNextTrack, nil); }
+
+void Plugin::previous() { MRMediaRemoteSendCommand(kMRPreviousTrack, nil); }
+
+bool Plugin::canPlay() { return true; }
+
+bool Plugin::canPause() { return true; }
+
+bool Plugin::canGoNext() { return true; }
+
+bool Plugin::canGoPrevious() { return true; }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -234,3 +270,24 @@ QWidget *Plugin::buildConfigWidget()
 //     }
 // };
 
+
+
+// void fetchNowPlayingInfo() {
+//     dispatch_queue_t queue = dispatch_get_main_queue();
+
+//     MRMediaRemoteGetNowPlayingInfo(queue, ^(CFDictionaryRef info) {
+//         if (!info) {
+//             NSLog(@"No media info available");
+//             return;
+//         }
+
+//         NSDictionary *dict = (__bridge NSDictionary *)info;
+//         NSString *title  = dict[(__bridge NSString *)kMRMediaRemoteNowPlayingInfoTitle];
+//         NSString *artist = dict[(__bridge NSString *)kMRMediaRemoteNowPlayingInfoArtist];
+//         NSString *album  = dict[(__bridge NSString *)kMRMediaRemoteNowPlayingInfoAlbum];
+
+//         CRIT << QString::fromNSString(title);
+//         CRIT << QString::fromNSString(artist);
+//         CRIT << QString::fromNSString(album);
+//     });
+// }

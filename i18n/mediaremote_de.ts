@@ -4,18 +4,13 @@
 <context>
     <name>ConfigWidget</name>
     <message>
-        <source>See the [MPRIS D-Bus Interface Specification](https://specifications.freedesktop.org/mpris-spec/latest/#About).
-
-Supported commands:
+        <source>Supported commands:
 
 - Play
 - Pause
 - Next
-- Previous
-- Stop</source>
-        <translation>Siehe die [MPRIS D-Bus Interface Specification](https://specifications.freedesktop.org/mpris-spec/latest/#About).
-
-Unterstützte Befehle:
+- Previous</source>
+        <translation>Unterstützte Befehle:
 
 Wiedergabe
 Pause
@@ -27,24 +22,12 @@ Stopp</translation>
 <context>
     <name>Plugin</name>
     <message>
-        <source>Raise</source>
-        <translation>Nach vorne bringen</translation>
-    </message>
-    <message>
-        <source>Quit</source>
-        <translation>Beenden</translation>
-    </message>
-    <message>
         <source>Play</source>
         <translation>Wiedergabe</translation>
     </message>
     <message>
         <source>Pause</source>
         <translation>Pause</translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation>Stopp</translation>
     </message>
     <message>
         <source>Next</source>
