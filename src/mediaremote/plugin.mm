@@ -23,7 +23,7 @@ static QString playerNamefromPid(int pid)
             [NSRunningApplication runningApplicationWithProcessIdentifier:pid];
             app)
             return QString::fromNSString(app.localizedName);
-    return QStringLiteral("N/A");
+    return {};
 }
 
 Plugin::Plugin() : d(make_unique<Private>())
@@ -52,7 +52,7 @@ Plugin::Plugin() : d(make_unique<Private>())
 
     // Initialize player_name_
     MRMediaRemoteGetNowPlayingApplicationPID(dispatch_get_main_queue(),
-                                             ^(int pid) { player_name_ = playerNamefromPid(pid); });
+                                             ^(int pid) { player_ = playerNamefromPid(pid); });
 
     // Watch player_name_
     [[NSNotificationCenter defaultCenter]
@@ -63,18 +63,18 @@ Plugin::Plugin() : d(make_unique<Private>())
                     int pid = [note.userInfo[kMRMediaRemoteNowPlayingApplicationPIDUserInfoKey]
                         intValue];
                     auto name = playerNamefromPid(pid);
-                    if (player_name_ != name)
+                    if (player_ != name)
                     {
-                        player_name_ = name;
+                        player_ = name;
                         DEBG << "player_name changed:" << name;
-                        emit playerNameChanged(name);
+                        emit playerChanged(name);
                     }
                 }];
 }
 
 Plugin::~Plugin() {}
 
-QString Plugin::playerName() { return player_name_; }
+QString Plugin::player() { return player_; }
 
 bool Plugin::isPlaying() { return is_playing_; }
 

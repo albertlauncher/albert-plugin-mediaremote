@@ -26,7 +26,7 @@ public:
     std::vector<albert::RankItem> handleGlobalQuery(const albert::Query &) override;
     QWidget *buildConfigWidget() override;
 
-    QString playerName() override;
+    QString player() override;
     bool isPlaying() override;
 
     void next() override;
@@ -63,7 +63,7 @@ private:
 
     struct Private;
     std::unique_ptr<Private> d;
-    QString player_name_;
+    QString player_;
     bool is_playing_;
 
 };

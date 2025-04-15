@@ -13,7 +13,7 @@ class ALBERT_EXPORT IPlugin : public QObject
     Q_OBJECT
 public:
 
-    virtual QString playerName() = 0;
+    virtual QString player() = 0;  // may be null
     virtual bool isPlaying() = 0;
 
     virtual bool canPlay() = 0;
@@ -29,7 +29,7 @@ public:
 signals:
 
     void isPlayingChanged(bool);
-    void playerNameChanged(QString);
+    void playerChanged(QString);  // may be null
 
 protected:
 
