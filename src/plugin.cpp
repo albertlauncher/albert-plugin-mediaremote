@@ -10,6 +10,7 @@
 ALBERT_LOGGING_CATEGORY("mediaplayerremote")
 using namespace albert;
 using namespace std;
+using namespace util;
 
 namespace albert::plugin::mediaremote {
 IPlugin::~IPlugin() = default;
