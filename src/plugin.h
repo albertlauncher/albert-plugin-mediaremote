@@ -40,23 +40,23 @@ public:
     bool canPlay() override;
 
     struct {
-        QString play = "Play";
-        QString pause = "Pause";
-        QString next = "Next";
-        QString previous = "Previous";
-        QString playing = "Playing";
-        QString paused = "Paused";
-        QString stopped = "Stopped";
+        QString play     = QStringLiteral("Play");
+        QString pause    = QStringLiteral("Pause");
+        QString next     = QStringLiteral("Next");
+        QString previous = QStringLiteral("Previous");
+        QString playing  = QStringLiteral("Playing");
+        QString paused   = QStringLiteral("Paused");
+        QString stopped  = QStringLiteral("Stopped");
     } const strings;
 
     struct {
-        QString play = tr("Play");
-        QString pause = tr("Pause");
-        QString next = tr("Next");
+        QString play     = tr("Play");
+        QString pause    = tr("Pause");
+        QString next     = tr("Next");
         QString previous = tr("Previous");
-        QString playing = tr("Playing");
-        QString paused = tr("Paused");
-        QString stopped = tr("Stopped");
+        QString playing  = tr("Playing");
+        QString paused   = tr("Paused");
+        QString stopped  = tr("Stopped");
     } const ui_strings;
 
 private:

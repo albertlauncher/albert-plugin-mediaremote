@@ -14,8 +14,8 @@ using namespace std;
 using MediaPlayer2Interface = OrgMprisMediaPlayer2Interface;
 using MediaPlayer2PlayerInterface = OrgMprisMediaPlayer2PlayerInterface;
 
-static const int dbus_timeout = 100;
-static const char * dbus_object_path = "/org/mpris/MediaPlayer2";
+static const auto dbus_timeout = 100;
+static const auto dbus_object_path = QStringLiteral("/org/mpris/MediaPlayer2");
 
 
 class Player
@@ -183,7 +183,7 @@ struct Plugin::Private
 {
     QDBusConnection bus = QDBusConnection::sessionBus();
     QDBusServiceWatcher service_watcher{
-        "org.mpris.MediaPlayer2*", bus,
+        QStringLiteral("org.mpris.MediaPlayer2*"), bus,
         QDBusServiceWatcher::WatchForOwnerChange
     };
     std::unique_ptr<Player> player;

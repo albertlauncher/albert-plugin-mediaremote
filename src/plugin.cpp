@@ -8,9 +8,10 @@
 #include <albert/matcher.h>
 #include <albert/standarditem.h>
 ALBERT_LOGGING_CATEGORY("mediaplayerremote")
+using namespace Qt::StringLiterals;
+using namespace albert::util;
 using namespace albert;
 using namespace std;
-using namespace util;
 
 namespace albert::plugin::mediaremote {
 IPlugin::~IPlugin() = default;
@@ -42,24 +43,36 @@ vector<RankItem> Plugin::handleGlobalQuery(const Query &query)
     Matcher matcher(query);
 
     if (auto m = matcher.match(strings.next, ui_strings.next, player_); m && canGoNext())
-        results.emplace_back(
-            makeItem(ui_strings.next, player_, {"qsp:SP_MediaSkipForward"}, [this]{next();}), m);
+        results.emplace_back(makeItem(ui_strings.next,
+                                      player_,
+                                      {u"qsp:SP_MediaSkipForward"_s},
+                                      [this] { next(); }),
+                             m);
 
     if (auto m = matcher.match(strings.previous, ui_strings.previous, player_); m && canGoPrevious())
-        results.emplace_back(
-            makeItem(ui_strings.previous, player_, {"qsp:SP_MediaSkipBackward"}, [this]{previous();}), m);
+        results.emplace_back(makeItem(ui_strings.previous,
+                                      player_,
+                                      {u"qsp:SP_MediaSkipBackward"_s},
+                                      [this] { previous(); }),
+                             m);
 
     if (isPlaying())
     {
         if (auto m = matcher.match(strings.pause, ui_strings.pause, player_); m && canPause())
-            results.emplace_back(
-                makeItem(ui_strings.pause, player_, {"qsp:SP_MediaPause"}, [this]{pause();}), m);
+            results.emplace_back(makeItem(ui_strings.pause,
+                                          player_,
+                                          {u"qsp:SP_MediaPause"_s},
+                                          [this] { pause(); }),
+                                 m);
     }
     else
     {
         if (auto m = matcher.match(strings.play, ui_strings.play, player_); m && canPlay())
-            results.emplace_back(
-                makeItem(ui_strings.play, player_, {"qsp:SP_MediaPlay"}, [this]{play();}), m);
+            results.emplace_back(makeItem(ui_strings.play,
+                                          player_,
+                                          {u"qsp:SP_MediaPlay"_s},
+                                          [this] { play(); }),
+                                 m);
     }
 
     return results;
