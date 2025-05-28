@@ -61,9 +61,14 @@ public:
 
 private:
 
+    QString makeSubtext() const;
+
     struct Private;
     std::unique_ptr<Private> d;
-    QString player_;
+    QString player_; // may be null
+    QString player_icon_url_; // may be null
+    QString now_playing_info_; // not used yet
+    QString now_playing_artwork_; // not used yet
     bool is_playing_;
 
 };

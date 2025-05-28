@@ -1,61 +1,67 @@
+// https://github.com/theos/headers/blob/master/MediaRemote/MediaRemote.h
+// https://github.com/khangthk/SketchyBar/blob/master/src/media.m
+
 #pragma once
 #include <objc/runtime.h>
-#include <Foundation/Foundation.h>
+#include <CoreFoundation/CoreFoundation.h>
 
 extern "C" {
 
-extern NSString* kMRMediaRemoteNowPlayingInfoDidChangeNotification;
-extern NSString* kMRMediaRemoteNowPlayingPlaybackQueueDidChangeNotification;
-extern NSString* kMRMediaRemotePickableRoutesDidChangeNotification;
-extern NSString* kMRMediaRemoteNowPlayingApplicationDidChangeNotification;
-extern NSString* kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification;
-extern NSString* kMRMediaRemoteRouteStatusDidChangeNotification;
+extern CFStringRef kMRMediaRemoteNowPlayingApplicationDidChangeNotification;
+extern CFStringRef kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification;
+extern CFStringRef kMRMediaRemoteNowPlayingClientsDidChangeNotification;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoDidChangeNotification;
+extern CFStringRef kMRMediaRemoteNowPlayingPlaybackQueueDidChangeNotification;
+extern CFStringRef kMRMediaRemotePickableRoutesDidChangeNotification;
+extern CFStringRef kMRMediaRemoteRouteStatusDidChangeNotification;
 
-extern NSString* kMRMediaRemoteNowPlayingApplicationPIDUserInfoKey;
-extern NSString* kMRMediaRemoteNowPlayingApplicationIsPlayingUserInfoKey;
-extern NSString* kMRMediaRemoteNowPlayingInfoAlbum;
-extern NSString* kMRMediaRemoteNowPlayingInfoArtist;
-extern NSString* kMRMediaRemoteNowPlayingInfoArtworkData;
-extern NSString* kMRMediaRemoteNowPlayingInfoArtworkMIMEType;
-extern NSString* kMRMediaRemoteNowPlayingInfoChapterNumber;
-extern NSString* kMRMediaRemoteNowPlayingInfoComposer;
-extern NSString* kMRMediaRemoteNowPlayingInfoDuration;
-extern NSString* kMRMediaRemoteNowPlayingInfoElapsedTime;
-extern NSString* kMRMediaRemoteNowPlayingInfoGenre;
-extern NSString* kMRMediaRemoteNowPlayingInfoIsAdvertisement;
-extern NSString* kMRMediaRemoteNowPlayingInfoIsBanned;
-extern NSString* kMRMediaRemoteNowPlayingInfoIsInWishList;
-extern NSString* kMRMediaRemoteNowPlayingInfoIsLiked;
-extern NSString* kMRMediaRemoteNowPlayingInfoIsMusicApp;
-extern NSString* kMRMediaRemoteNowPlayingInfoMediaType;
-extern NSString* kMRMediaRemoteNowPlayingInfoPlaybackRate;
-extern NSString* kMRMediaRemoteNowPlayingInfoProhibitsSkip;
-extern NSString* kMRMediaRemoteNowPlayingInfoQueueIndex;
-extern NSString* kMRMediaRemoteNowPlayingInfoRadioStationIdentifier;
-extern NSString* kMRMediaRemoteNowPlayingInfoRepeatMode;
-extern NSString* kMRMediaRemoteNowPlayingInfoShuffleMode;
-extern NSString* kMRMediaRemoteNowPlayingInfoStartTime;
-extern NSString* kMRMediaRemoteNowPlayingInfoSupportsFastForward15Seconds;
-extern NSString* kMRMediaRemoteNowPlayingInfoSupportsIsBanned;
-extern NSString* kMRMediaRemoteNowPlayingInfoSupportsIsLiked;
-extern NSString* kMRMediaRemoteNowPlayingInfoSupportsRewind15Seconds;
-extern NSString* kMRMediaRemoteNowPlayingInfoTimestamp;
-extern NSString* kMRMediaRemoteNowPlayingInfoTitle;
-extern NSString* kMRMediaRemoteNowPlayingInfoTotalChapterCount;
-extern NSString* kMRMediaRemoteNowPlayingInfoTotalDiscCount;
-extern NSString* kMRMediaRemoteNowPlayingInfoTotalQueueCount;
-extern NSString* kMRMediaRemoteNowPlayingInfoTotalTrackCount;
-extern NSString* kMRMediaRemoteNowPlayingInfoTrackNumber;
-extern NSString* kMRMediaRemoteNowPlayingInfoUniqueIdentifier;
-extern NSString* kMRMediaRemoteNowPlayingInfoRadioStationIdentifier;
-extern NSString* kMRMediaRemoteNowPlayingInfoRadioStationHash;
-extern NSString* kMRMediaRemoteOptionMediaType;
-extern NSString* kMRMediaRemoteOptionSourceID;
-extern NSString* kMRMediaRemoteOptionTrackID;
-extern NSString* kMRMediaRemoteOptionStationID;
-extern NSString* kMRMediaRemoteOptionStationHash;
-extern NSString* kMRMediaRemoteRouteDescriptionUserInfoKey;
-extern NSString* kMRMediaRemoteRouteStatusUserInfoKey;
+extern CFStringRef kMRMediaRemoteNowPlayingApplicationPIDUserInfoKey;
+extern CFStringRef kMRMediaRemoteNowPlayingApplicationIsPlayingUserInfoKey;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoAlbum;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoArtist;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoArtworkData;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoArtworkMIMEType;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoChapterNumber;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoComposer;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoDuration;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoElapsedTime;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoGenre;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoIsAdvertisement;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoIsBanned;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoIsInWishList;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoIsLiked;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoIsMusicApp;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoMediaType;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoPlaybackRate;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoProhibitsSkip;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoQueueIndex;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoRadioStationIdentifier;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoRepeatMode;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoShuffleMode;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoStartTime;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoSupportsFastForward15Seconds;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoSupportsIsBanned;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoSupportsIsLiked;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoSupportsRewind15Seconds;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoTimestamp;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoTitle;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoTotalChapterCount;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoTotalDiscCount;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoTotalQueueCount;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoTotalTrackCount;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoTrackNumber;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoUniqueIdentifier;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoRadioStationIdentifier;
+extern CFStringRef kMRMediaRemoteNowPlayingInfoRadioStationHash;
+extern CFStringRef kMRMediaRemoteOptionMediaType;
+extern CFStringRef kMRMediaRemoteOptionSourceID;
+extern CFStringRef kMRMediaRemoteOptionTrackID;
+extern CFStringRef kMRMediaRemoteOptionStationID;
+extern CFStringRef kMRMediaRemoteOptionStationHash;
+extern CFStringRef kMRMediaRemoteRouteDescriptionUserInfoKey;
+extern CFStringRef kMRMediaRemoteRouteStatusUserInfoKey;
+extern CFStringRef kMRMediaRemoteUpdatedContentItemsUserInfoKey;
+
 
 typedef enum {
     /*
@@ -124,7 +130,7 @@ void MRMediaRemoteSetRepeatMode(int mode);
 int MRMediaRemoteSelectSourceWithID(CFStringRef identifier);
 void MRMediaRemoteSetPickedRouteWithPassword(CFStringRef route, CFStringRef password);
 
-CFArrayRef MRMediaRemoteCopyPickableRoutesForCategory(NSString *category);
+CFArrayRef MRMediaRemoteCopyPickableRoutesForCategory(CFStringRef *category);
 Boolean MRMediaRemotePickedRouteHasVolumeControl();
 void MRMediaRemoteSetCanBeNowPlayingApplication(Boolean can);
 void MRMediaRemoteSetNowPlayingInfo(CFDictionaryRef information);

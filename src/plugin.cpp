@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2024 Manuel Schneider
+// Copyright (c) 2017-2025 Manuel Schneider
 
-#include "plugin.h"
 #include "albert/pluginloader.h"
 #include "albert/pluginmetadata.h"
+#include "plugin.h"
 #include "ui_configwidget.h"
+#include <QUrl>
 #include <albert/logging.h>
 #include <albert/matcher.h>
 #include <albert/standarditem.h>
@@ -12,6 +13,11 @@ using namespace Qt::StringLiterals;
 using namespace albert::util;
 using namespace albert;
 using namespace std;
+
+static const auto icon_play = u"gen:?text=▶️"_s;
+static const auto icon_pause = u"gen:?text=⏸️"_s;
+static const auto icon_next = u"gen:?text=⏭️"_s;
+static const auto icon_prev = u"gen:?text=⏮️"_s;
 
 namespace albert::plugin::mediaremote {
 IPlugin::~IPlugin() = default;
@@ -37,42 +43,74 @@ static inline shared_ptr<Item> makeItem(const QString &cmd,
                               {{ cmd, cmd, ::move(action)}});
 }
 
+QString Plugin::makeSubtext() const
+{
+    return now_playing_info_.isNull() ? player_
+                                      : QStringLiteral("%1 · %2")
+                                            .arg(player_, now_playing_info_);
+}
+
 vector<RankItem> Plugin::handleGlobalQuery(const Query &query)
 {
     vector<RankItem> results;
     Matcher matcher(query);
 
-    if (auto m = matcher.match(strings.next, ui_strings.next, player_); m && canGoNext())
-        results.emplace_back(makeItem(ui_strings.next,
-                                      player_,
-                                      {u"qsp:SP_MediaSkipForward"_s},
-                                      [this] { next(); }),
-                             m);
+    if (auto m = matcher.match(strings.next, ui_strings.next, player_);
+        m && canGoNext())
+        results.emplace_back(
+            makeItem(
+                ui_strings.next,
+                player_,
+                {u"comp:?src1=%1&src2=%2"_s
+                        .arg(QString::fromUtf8(QUrl::toPercentEncoding(player_icon_url_)),
+                             QString::fromUtf8(QUrl::toPercentEncoding(icon_next)))
+                },
+                [this] { next(); }),
+            m);
 
-    if (auto m = matcher.match(strings.previous, ui_strings.previous, player_); m && canGoPrevious())
-        results.emplace_back(makeItem(ui_strings.previous,
-                                      player_,
-                                      {u"qsp:SP_MediaSkipBackward"_s},
-                                      [this] { previous(); }),
-                             m);
+    if (auto m = matcher.match(strings.previous, ui_strings.previous, player_);
+        m && canGoPrevious())
+        results.emplace_back(
+            makeItem(
+                ui_strings.previous,
+                player_,
+                {u"comp:?src1=%1&src2=%2"_s
+                        .arg(QString::fromUtf8(QUrl::toPercentEncoding(player_icon_url_)),
+                             QString::fromUtf8(QUrl::toPercentEncoding(icon_prev)))
+                },
+                [this] { previous(); }),
+            m);
+
+    CRIT << u"comp:?src1=%1&src2=qsp%3ASP_MediaPause"_s
+                .arg(QString::fromUtf8(QUrl::toPercentEncoding(player_icon_url_)));
 
     if (isPlaying())
     {
         if (auto m = matcher.match(strings.pause, ui_strings.pause, player_); m && canPause())
-            results.emplace_back(makeItem(ui_strings.pause,
-                                          player_,
-                                          {u"qsp:SP_MediaPause"_s},
-                                          [this] { pause(); }),
-                                 m);
+            results.emplace_back(
+                makeItem(
+                    ui_strings.pause,
+                    makeSubtext(),
+                    {u"comp:?src1=%1&src2=%2"_s
+                         .arg(QString::fromUtf8(QUrl::toPercentEncoding(player_icon_url_)),
+                              QString::fromUtf8(QUrl::toPercentEncoding(icon_pause)))
+                    },
+                    [this] { pause(); }),
+                m);
     }
     else
     {
         if (auto m = matcher.match(strings.play, ui_strings.play, player_); m && canPlay())
-            results.emplace_back(makeItem(ui_strings.play,
-                                          player_,
-                                          {u"qsp:SP_MediaPlay"_s},
-                                          [this] { play(); }),
-                                 m);
+            results.emplace_back(
+                makeItem(
+                    ui_strings.play,
+                    makeSubtext(),
+                    {u"comp:?src1=%1&src2=%2"_s
+                            .arg(QString::fromUtf8(QUrl::toPercentEncoding(player_icon_url_)),
+                                 QString::fromUtf8(QUrl::toPercentEncoding(icon_play)))
+                    },
+                    [this] { play(); }),
+                m);
     }
 
     return results;
