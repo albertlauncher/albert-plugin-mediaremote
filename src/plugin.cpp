@@ -17,11 +17,11 @@ namespace albert::plugin::mediaremote {
 IPlugin::~IPlugin() = default;
 }
 
-QString Plugin::id() const { return loader().metaData().id; }
+QString Plugin::id() const { return loader().metadata().id; }
 
-QString Plugin::name() const { return loader().metaData().name; }
+QString Plugin::name() const { return loader().metadata().name; }
 
-QString Plugin::description() const { return loader().metaData().description; }
+QString Plugin::description() const { return loader().metadata().description; }
 
 vector<Extension *> Plugin::extensions() { return {this}; }
 
