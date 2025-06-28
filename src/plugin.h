@@ -1,14 +1,30 @@
-// Copyright (c) 2017-2024 Manuel Schneider
+// Copyright (c) 2017-2025 Manuel Schneider
 
 #pragma once
-#include "mediaremote.h"
-#include <albert/plugininstance.h>
+#include "player.h"
+#include <albert/extensionplugin.h>
 #include <albert/globalqueryhandler.h>
+#include <shared_mutex>
 
-class Plugin : public albert::plugin::mediaremote::IPlugin,
-               public albert::PluginInstance,
+// Expected player interface
+// class Player
+// {
+// public:
+//     QString name() const;
+//     QString iconUrl() const;
+//     bool isPlaying() const;
+//     bool canPlay() const;
+//     bool canPause() const;
+//     bool canGoNext() const;
+//     bool canGoPrevious() const;
+//     void play();
+//     void pause();
+//     void next();
+//     void previous();
+// };
+
+class Plugin : public albert::util::ExtensionPlugin,
                public albert::GlobalQueryHandler
-
 {
     ALBERT_PLUGIN
 
@@ -17,53 +33,14 @@ public:
     Plugin();
     ~Plugin();
 
-    // TODO extensionplugin should not inherit QOBJECT
-    QString id() const override;
-    QString name() const override;
-    QString description() const override;
-    std::vector<albert::Extension*> extensions() override;
-
     std::vector<albert::RankItem> handleGlobalQuery(const albert::Query &) override;
-    QWidget *buildConfigWidget() override;
 
-    QString player() override;
-    bool isPlaying() override;
+protected:
 
-    void next() override;
-    void pause() override;
-    void play() override;
-    void previous() override;
-
-    bool canGoNext() override;
-    bool canGoPrevious() override;
-    bool canPause() override;
-    bool canPlay() override;
-
-    struct {
-        QString play     = QStringLiteral("Play");
-        QString pause    = QStringLiteral("Pause");
-        QString next     = QStringLiteral("Next");
-        QString previous = QStringLiteral("Previous");
-        QString playing  = QStringLiteral("Playing");
-        QString paused   = QStringLiteral("Paused");
-        QString stopped  = QStringLiteral("Stopped");
-    } const strings;
-
-    struct {
-        QString play     = tr("Play");
-        QString pause    = tr("Pause");
-        QString next     = tr("Next");
-        QString previous = tr("Previous");
-        QString playing  = tr("Playing");
-        QString paused   = tr("Paused");
-        QString stopped  = tr("Stopped");
-    } const ui_strings;
-
-private:
+    std::shared_mutex players_mtx_;
+    std::map<QString, std::shared_ptr<Player>> players_;
 
     struct Private;
     std::unique_ptr<Private> d;
-    QString player_;
-    bool is_playing_;
 
 };

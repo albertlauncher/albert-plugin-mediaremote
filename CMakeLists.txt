@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(mediaremote VERSION 6.3)
+project(mediaremote VERSION 7.0)
 
 find_package(Albert REQUIRED)
 
@@ -28,7 +28,11 @@ if(APPLE)
         src/mediaremote/*.mm
     )
 
+    albert_plugin_include_directories(PRIVATE src/mediaremote)
+
 elseif(UNIX)
+
+    albert_plugin_include_directories(PRIVATE src/mpris)
 
     albert_plugin_link_qt(DBus VERSION 6.0 REQUIRED)
 

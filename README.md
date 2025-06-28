@@ -2,26 +2,15 @@
 
 ## Features
 
-- Control playback with 'Play', 'Pause', 'Next', 'Previous' items.
-- Items match by localized and english titles.
-- Items can also be matched by the player name.
-
-## API
-
-- Exposes several functions related to players and playback.
+- Control playback of active players with 'Play', 'Pause', 'Next', 'Previous' items.
+- Items match player name and localized and english titles.
 
 ## Platforms
 
-- macOS
-- UNIX
+- macOS (Private MediaRemote.framework)
+- Freedesktop (MPRIS DBus API)
 
-## Technical notes
+## Limitations
 
-### macOS 
-
-- Uses private API (MediaRemote.framework).
-
-### UNIX
-
-- Uses MPRIS DBus interface.
-
+On macOS only one player at a time is recognized as playing application. That's the one you would
+expect to be controlled by the media keys.
