@@ -11,33 +11,20 @@ class Plugin : public albert::plugin::mediaremote::IPlugin,
 
 {
     ALBERT_PLUGIN
-
-public:
-
-    Plugin();
-    ~Plugin();
-
     // TODO extensionplugin should not inherit QOBJECT
     QString id() const override;
     QString name() const override;
     QString description() const override;
     std::vector<albert::Extension*> extensions() override;
 
+public:
+
+    Plugin();
+    ~Plugin();
+
     std::vector<albert::RankItem> handleGlobalQuery(const albert::Query &) override;
     QWidget *buildConfigWidget() override;
-
-    QString player() override;
-    bool isPlaying() override;
-
-    void next() override;
-    void pause() override;
-    void play() override;
-    void previous() override;
-
-    bool canGoNext() override;
-    bool canGoPrevious() override;
-    bool canPause() override;
-    bool canPlay() override;
+    const std::map<QString, std::unique_ptr<albert::plugin::mediaremote::IPlayer>> &players() override;
 
     struct {
         QString play     = QStringLiteral("Play");
@@ -57,13 +44,13 @@ public:
         QString playing  = tr("Playing");
         QString paused   = tr("Paused");
         QString stopped  = tr("Stopped");
-    } const ui_strings;
+    } const tr_strings;
 
-private:
+protected:
+
+    std::map<QString, std::unique_ptr<albert::plugin::mediaremote::IPlayer>> players_;
 
     struct Private;
     std::unique_ptr<Private> d;
-    QString player_;
-    bool is_playing_;
 
 };

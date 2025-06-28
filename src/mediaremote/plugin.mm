@@ -14,47 +14,108 @@ using namespace std;
 #error This file must be compiled with ARC.
 #endif
 
-struct Plugin::Private {};
 
-static QString playerNamefromPid(int pid)
+class DefaultPlayer : public albert::plugin::mediaremote::IPlayer
 {
-    if (pid)
-        if (NSRunningApplication *app =
-            [NSRunningApplication runningApplicationWithProcessIdentifier:pid];
-            app)
-            return QString::fromNSString(app.localizedName);
-    return {};
-}
+    bool is_playing_;
+    // QString id_;
+    QString name_;
+    QString icon_url_;
+    QString isPlayingTitle_;
+    QString isPlayingInfo_;
+    ::id notificationObservation_;
+
+public:
+
+    DefaultPlayer(int pid)
+    {
+        auto *app = [NSRunningApplication runningApplicationWithProcessIdentifier:pid];
+
+        if (!app)
+        {
+            WARN << "Failed to get running application with PID:" << pid;
+            return;
+        }
+
+        name_ = QString::fromNSString(app.localizedName);
+
+        NSURL *bundleURL = app.bundleURL;
+        NSString *bundlePath = bundleURL.path;
+        icon_url_ = u"qfip:" + QString::fromNSString(bundlePath);
+
+        // Initialize is_playing_
+        MRMediaRemoteGetNowPlayingApplicationIsPlaying(
+            dispatch_get_main_queue(),
+            ^(Boolean isPlaying) { is_playing_ = isPlaying; }
+        );
+
+        // Watch is_playing_
+        notificationObservation_ = [[NSNotificationCenter defaultCenter]
+            addObserverForName:kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification
+                        object:nil
+                         queue:[NSOperationQueue mainQueue]
+                    usingBlock:^(NSNotification *note) {
+                        bool v = [note.userInfo[kMRMediaRemoteNowPlayingApplicationIsPlayingUserInfoKey]
+                            boolValue];
+                        if (is_playing_ != v)
+                        {
+                            is_playing_ = v;
+                            DEBG << "is_playing changed:" << v;
+                            emit isPlayingChanged(v);
+                        }
+                    }];
+
+    }
+
+    ~DefaultPlayer() override
+    {
+        [[NSNotificationCenter defaultCenter] removeObserver:notificationObservation_];
+    }
+
+    // QString id() const override { return id_; }
+    QString name() const override { return name_; }
+    QString iconUrl() const override  { return icon_url_; }
+
+    bool isPlaying() const override { return is_playing_; }
+    // QString isPlayingTitle() const override { return isPlayingTitle_; }
+    // QString isPlayingInfo() const override { return isPlayingInfo_; }
+
+    bool canPlay() const override { return true; }
+    bool canPause() const override { return true; }
+    bool canGoNext() const override { return true; }
+    bool canGoPrevious() const override { return true; }
+
+    // void playPause() { MRMediaRemoteSendCommand(kMRTogglePlayPause, nil); }
+    void play() override { MRMediaRemoteSendCommand(kMRPlay, nil); }
+    void pause() override { MRMediaRemoteSendCommand(kMRPause, nil); }
+    void next() override { MRMediaRemoteSendCommand(kMRNextTrack, nil); }
+    void previous() override { MRMediaRemoteSendCommand(kMRPreviousTrack, nil); }
+};
+
+struct Plugin::Private
+{
+public:
+
+};
 
 Plugin::Plugin() : d(make_unique<Private>())
 {
     MRMediaRemoteRegisterForNowPlayingNotifications(dispatch_get_main_queue());
 
-    // Initialize is_playing_
-    MRMediaRemoteGetNowPlayingApplicationIsPlaying(
-        dispatch_get_main_queue(), ^(Boolean isPlaying) { is_playing_ = isPlaying; });
+    auto updatePlayerBlock = ^(int pid) {
+        players_.clear();
+        if (pid != 0)
+        {
+            auto player = make_unique<DefaultPlayer>(pid);
+            players_.emplace(player->name(), ::move(player));
+        }
+        emit playersChanged();
+    };
 
-    // Watch is_playing_
-    [[NSNotificationCenter defaultCenter]
-        addObserverForName:kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification
-                    object:nil
-                     queue:[NSOperationQueue mainQueue]
-                usingBlock:^(NSNotification *note) {
-                    bool v = [note.userInfo[kMRMediaRemoteNowPlayingApplicationIsPlayingUserInfoKey]
-                        boolValue];
-                    if (is_playing_ != v)
-                    {
-                        is_playing_ = v;
-                        DEBG << "is_playing changed:" << v;
-                        emit isPlayingChanged(v);
-                    }
-                }];
+    // Initialize player
+    MRMediaRemoteGetNowPlayingApplicationPID(dispatch_get_main_queue(), updatePlayerBlock);
 
-    // Initialize player_name_
-    MRMediaRemoteGetNowPlayingApplicationPID(dispatch_get_main_queue(),
-                                             ^(int pid) { player_ = playerNamefromPid(pid); });
-
-    // Watch player_name_
+    // Watch player
     [[NSNotificationCenter defaultCenter]
         addObserverForName:kMRMediaRemoteNowPlayingApplicationDidChangeNotification
                     object:nil
@@ -62,39 +123,11 @@ Plugin::Plugin() : d(make_unique<Private>())
                 usingBlock:^(NSNotification *note) {
                     int pid = [note.userInfo[kMRMediaRemoteNowPlayingApplicationPIDUserInfoKey]
                         intValue];
-                    auto name = playerNamefromPid(pid);
-                    if (player_ != name)
-                    {
-                        player_ = name;
-                        DEBG << "player_name changed:" << name;
-                        emit playerChanged(name);
-                    }
+                    updatePlayerBlock(pid);
                 }];
 }
 
 Plugin::~Plugin() {}
-
-QString Plugin::player() { return player_; }
-
-bool Plugin::isPlaying() { return is_playing_; }
-
-// void Plugin::playPause() { MRMediaRemoteSendCommand(kMRTogglePlayPause, nil); }
-
-void Plugin::play() { MRMediaRemoteSendCommand(kMRPlay, nil); }
-
-void Plugin::pause() { MRMediaRemoteSendCommand(kMRPause, nil); }
-
-void Plugin::next() { MRMediaRemoteSendCommand(kMRNextTrack, nil); }
-
-void Plugin::previous() { MRMediaRemoteSendCommand(kMRPreviousTrack, nil); }
-
-bool Plugin::canPlay() { return true; }
-
-bool Plugin::canPause() { return true; }
-
-bool Plugin::canGoNext() { return true; }
-
-bool Plugin::canGoPrevious() { return true; }
 
 
 
