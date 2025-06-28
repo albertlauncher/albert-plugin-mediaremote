@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024 Manuel Schneider
+// Copyright (c) 2017-2025 Manuel Schneider
 
 #include "plugin.h"
 #include "ui_configwidget.h"

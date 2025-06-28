@@ -7,9 +7,11 @@
 #include <QDBusMetaType>
 #include <QDBusServiceWatcher>
 #include <albert/logging.h>
+#include <albert/desktopentryparser.h>
 #include <albert/matcher.h>
 #include <albert/standarditem.h>
 using namespace Qt::StringLiterals;
+using namespace albert::detail;
 using namespace albert;
 using namespace std;
 using MediaPlayer2Interface = OrgMprisMediaPlayer2Interface;
@@ -18,6 +20,16 @@ using MediaPlayer2PlayerInterface = OrgMprisMediaPlayer2PlayerInterface;
 static const auto dbus_timeout = 100;
 static const auto dbus_object_path = QStringLiteral("/org/mpris/MediaPlayer2");
 
+static QString getDesktopEntry(const QString desktop_entry_basename)
+{
+    const auto xdg_data_dirs(qEnvironmentVariable("XDG_DATA_DIRS").split(u':', Qt::SkipEmptyParts));
+    for (const auto &xdg_data_dir : xdg_data_dirs)
+        if (const auto file_path = QString(u"%1/applications/%2.desktop"_s)
+                                       .arg(xdg_data_dir, desktop_entry_basename);
+            QFile::exists(file_path))
+            return file_path;
+    return {};
+}
 
 class Player : public albert::plugin::mediaremote::IPlayer
 {
@@ -34,13 +46,22 @@ public:
         control(dbus_service_name, dbus_object_path, QDBusConnection::sessionBus()),
         name_(player.identity())
     {
-
-        if (auto de = player.desktopEntry();
-            !de.isEmpty())
-            icon_url_ = u"xdg:%1"_s.arg(de);
+        if (const auto file_path = getDesktopEntry(player.desktopEntry());
+            file_path.isEmpty())
+        {
+            name_ = player.desktopEntry();
+            icon_url_ = u"xdg:multimedia-player"_s;
+        }
         else
-            icon_url_ = u"xdg:media-player"_s;
-
+        {
+            DesktopEntryParser desktop_entry(file_path);
+            name_ = desktop_entry.getLocaleString(u"Desktop Entry"_s, u"Name"_s);
+            if (const auto icon_string = desktop_entry.getIconString(u"Desktop Entry"_s, u"Icon"_s);
+                QFile::exists(icon_string))
+                icon_url_ = u"file:"_s + icon_string;
+            else
+                icon_url_ = u"xdg:"_s + icon_string;
+        }
 
         player.setTimeout(dbus_timeout);
         control.setTimeout(dbus_timeout);
