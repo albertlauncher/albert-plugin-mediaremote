@@ -9,6 +9,7 @@
 #include <albert/logging.h>
 #include <albert/matcher.h>
 #include <albert/standarditem.h>
+using namespace Qt::StringLiterals;
 using namespace albert;
 using namespace std;
 using MediaPlayer2Interface = OrgMprisMediaPlayer2Interface;
@@ -18,79 +19,67 @@ static const auto dbus_timeout = 100;
 static const auto dbus_object_path = QStringLiteral("/org/mpris/MediaPlayer2");
 
 
-class Player
+class Player : public albert::plugin::mediaremote::IPlayer
 {
 public:
     const QString dbus_service_name;
     OrgMprisMediaPlayer2Interface player;
     MediaPlayer2PlayerInterface control;
-    QString id;
+    QString name_;
+    QString icon_url_;
 
-
-    Player(const QString &service_name,const QDBusConnection &session_bus):
+    Player(const QString &service_name):
         dbus_service_name(service_name),
-        player(dbus_service_name, dbus_object_path, session_bus),
-        control(dbus_service_name, dbus_object_path, session_bus),
-        id(player.identity())
+        player(dbus_service_name, dbus_object_path, QDBusConnection::sessionBus()),
+        control(dbus_service_name, dbus_object_path, QDBusConnection::sessionBus()),
+        name_(player.identity())
     {
+
+        if (auto de = player.desktopEntry();
+            !de.isEmpty())
+            icon_url_ = u"xdg:%1"_s.arg(de);
+        else
+            icon_url_ = u"xdg:media-player"_s;
+
+
         player.setTimeout(dbus_timeout);
         control.setTimeout(dbus_timeout);
-
-        // TODO: it makes no sense to proceed here without dynamic items
-        // notes: qdbusxml2cpp created files are still low level. calls are sync there are no
-        // signals emitted for changed properties. this has to be done manually. also since qobject
-        // does not support multiple inheritance the way to go is probably another level on top
-        // facading all the dbus interfaces below.
-        // Helpful: QDBUS_DEBUG=1
     }
 
-    // inline shared_ptr<Item>
-    // makeCtlItem(const QString &cmd, const QStringList &icon_urls, function<void()> &&action)
-    // { return StandardItem::make(cmd, cmd, id, icon_urls, {{ cmd, cmd, ::move(action)}}); }
+    QString name() const override { return name_; }
+    QString iconUrl() const override  { return icon_url_; }
 
-    // void addItems(vector<RankItem>& items, const QString &query)
-    // {
-    //     if (!control.canControl())
-    //         return;
+    bool isPlaying() const override {
+        //     enum PlaybackStatus { Playing, Paused, Stopped };
+        //     static const QString playback_status_strings[] = {
+        //         Plugin::tr("Playing"),
+        //         Plugin::tr("Paused"),
+        //         Plugin::tr("Stopped")
+        //     };
+        //     PlaybackStatus playback_status = Stopped;
+        //     if (control.playbackStatus() == QStringLiteral("Playing"))
+        //         playback_status = Playing;
+        //     else if (control.playbackStatus() == QStringLiteral("Paused"))
+        //         playback_status = Paused;
+        //     else if (control.playbackStatus() == QStringLiteral("Stopped"))
+        //         playback_status = Stopped;
+        //     else
+        //         WARN << "Invalid playback status received:" << control.playbackStatus();
+        //     return playback_status == Playing;
+        return control.playbackStatus() == QStringLiteral("Playing");
+    }
+    // QString isPlayingTitle() const override { return isPlayingTitle_; }
+    // QString isPlayingInfo() const override { return isPlayingInfo_; }
 
-    //     static const QString tr_raise = Plugin::tr("Raise");
-    //     static const QString tr_quit = Plugin::tr("Quit");
-    //     static const QString tr_play = Plugin::tr("Play");
-    //     static const QString tr_pause = Plugin::tr("Pause");
-    //     static const QString tr_stop = Plugin::tr("Stop");
-    //     static const QString tr_next = Plugin::tr("Next");
-    //     static const QString tr_prev = Plugin::tr("Previous");
+    bool canPlay() const override { return control.canPlay(); }
+    bool canPause() const override { return control.canPause(); }
+    bool canGoNext() const override { return control.canGoNext(); }
+    bool canGoPrevious() const override { return control.canGoPrevious(); }
 
-    //     static const QStringList iu_play = {"xdg:media-playback-start"};
-    //     static const QStringList iu_pause = {"xdg:media-playback-pause"};
-    //     static const QStringList iu_stop = {"xdg:media-playback-stop"};
-    //     static const QStringList iu_next = {"xdg:media-skip-forward"};
-    //     static const QStringList iu_prev = {"xdg:media-skip-backward"};
-    //     static const QStringList iu_player = {"xdg:multimedia-player"};
-
-    //     static const auto act_play = [this]{ control.Play(); };
-    //     static const auto act_pause = [this]{ control.Pause(); };
-    //     static const auto act_stop = [this]{ control.Stop(); };
-    //     static const auto act_next = [this]{ control.Next(); };
-    //     static const auto act_prev = [this]{ control.Previous(); };
-
-    //     enum PlaybackStatus { Playing, Paused, Stopped };
-    //     static const QString playback_status_strings[] = {
-    //         Plugin::tr("Playing"),
-    //         Plugin::tr("Paused"),
-    //         Plugin::tr("Stopped")
-    //     };
-
-    //     PlaybackStatus playback_status = Stopped;
-    //     if (control.playbackStatus() == QStringLiteral("Playing"))
-    //         playback_status = Playing;
-    //     else if (control.playbackStatus() == QStringLiteral("Paused"))
-    //         playback_status = Paused;
-    //     else if (control.playbackStatus() == QStringLiteral("Stopped"))
-    //         playback_status = Stopped;
-    //     else
-    //         WARN << "Invalid playback status received:" << control.playbackStatus();
-
+    void play() override { control.Play(); }
+    void pause() override { control.Pause(); }
+    void next() override { control.Next(); }
+    void previous() override { control.Previous(); }
 
     //     Matcher matcher(query);
 
@@ -124,9 +113,6 @@ public:
     //             actions.emplace_back(tr_quit, tr_quit, [this]{ player.Quit(); });
 
     //         QStringList icon_urls;
-    //         if (auto de = player.desktopEntry(); !de.isEmpty())
-    //             icon_urls << QString("xdg:%1").arg(de);
-    //         icon_urls << iu_player;
 
     //         // https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata/
 
@@ -181,26 +167,25 @@ public:
 
 struct Plugin::Private
 {
-    QDBusConnection bus = QDBusConnection::sessionBus();
     QDBusServiceWatcher service_watcher{
-        QStringLiteral("org.mpris.MediaPlayer2*"), bus,
+        QStringLiteral("org.mpris.MediaPlayer2*"),
+        QDBusConnection::sessionBus(),
         QDBusServiceWatcher::WatchForOwnerChange
     };
-    std::unique_ptr<Player> player;
 
     void serviceOwnerChanged(const QString &service, const QString &, const QString &new_owner)
     {
-        if (new_owner.isEmpty())
-            player.reset();
-        else
-            player = make_unique<Player>(service, bus);
+    //     if (new_owner.isEmpty())
+    //         player.reset();
+    //     else
+    //         player = make_unique<Player>(service);
     }
 };
 
 
 Plugin::Plugin() : d(make_unique<Private>())
 {
-    if (!d->bus.isConnected())
+    if (!QDBusConnection::sessionBus().isConnected())
         throw runtime_error("Failed to connect to session bus.");
 
     connect(&d->service_watcher, &QDBusServiceWatcher::serviceOwnerChanged, this,
@@ -208,35 +193,17 @@ Plugin::Plugin() : d(make_unique<Private>())
             { d->serviceOwnerChanged(service, old_owner, new_owner); } );
 
     // Each media player must request a unique bus name which begins with org.mpris.MediaPlayer2
-    if (auto reply = d->bus.interface()->registeredServiceNames(); !reply.isValid())
+    if (auto reply = QDBusConnection::sessionBus().interface()->registeredServiceNames();
+        !reply.isValid())
         throw runtime_error(reply.error().message().toStdString());
-    // else
-        // for (const auto &service : reply.value())
-        //     if (service.startsWith(QStringLiteral("org.mpris.MediaPlayer2.")))
-        //         d->players.emplace(piecewise_construct, forward_as_tuple(service), forward_as_tuple(service, d->bus));
+    else
+        for (const auto &service : reply.value())
+            if (service.startsWith(QStringLiteral("org.mpris.MediaPlayer2.")))
+            {
+                auto player = make_unique<Player>(service);
+                players_.emplace(player->name(), ::move(player));
+            }
 }
 
 Plugin::~Plugin() = default;
-
-QString Plugin::player() { return player_; }
-
-bool Plugin::isPlaying() { return is_playing_; }
-
-// void Plugin::playPause() { MRMediaRemoteSendCommand(kMRTogglePlayPause, nil); }
-
-void Plugin::play() { d->player->control.Play(); }
-
-void Plugin::pause() { d->player->control.Pause(); }
-
-void Plugin::next() { d->player->control.Next(); }
-
-void Plugin::previous() { d->player->control.Previous(); }
-
-bool Plugin::canPlay() { return d->player && d->player->control.canPlay(); }
-
-bool Plugin::canPause() { return d->player && d->player->control.canPause(); }
-
-bool Plugin::canGoNext() { return d->player && d->player->control.canGoNext(); }
-
-bool Plugin::canGoPrevious() { return d->player && d->player->control.canGoPrevious(); }
 

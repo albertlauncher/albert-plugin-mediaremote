@@ -18,6 +18,13 @@ public:
     virtual QString name() const = 0;
     virtual QString iconUrl() const = 0;
 
+    // enum PlaybackStatus { Playing, Paused, Stopped };
+    // static const QString playback_status_strings[] = {
+    //     Plugin::tr("Playing"),
+    //     Plugin::tr("Paused"),
+    //     Plugin::tr("Stopped")
+    // };
+
     virtual bool isPlaying() const = 0;
     // virtual QString isPlayingTitle() const = 0;
     // virtual QString isPlayingInfo() const = 0;
@@ -32,8 +39,6 @@ public:
     virtual void next() = 0;
     virtual void previous() = 0;
 
-
-    virtual ~IPlayer() = default;;
 signals:
 
     void isPlayingChanged(bool);
