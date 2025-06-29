@@ -3,6 +3,7 @@
 #include "plugin.h"
 #include <QDBusConnection>
 #include <QDBusServiceWatcher>
+#include <mutex>
 using namespace Qt::StringLiterals;
 using namespace std;
 
