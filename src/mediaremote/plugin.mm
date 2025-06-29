@@ -2,6 +2,7 @@
 
 #include "mediaremote.h"
 #include "plugin.h"
+#include <mutex>
 using namespace std;
 #if  ! __has_feature(objc_arc)
 #error This file must be compiled with ARC.
@@ -14,6 +15,7 @@ Plugin::Plugin() : d(make_unique<Private>())
     MRMediaRemoteRegisterForNowPlayingNotifications(dispatch_get_main_queue());
 
     auto updatePlayerBlock = ^(int pid) {
+        scoped_lock lock(players_mtx_);
         players_.clear();
         if (pid != 0)
         {
