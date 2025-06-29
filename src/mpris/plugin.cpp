@@ -1,16 +1,11 @@
 // Copyright (c) 2017-2024 Manuel Schneider
 
 #include "plugin.h"
-// #include <QDBusConnection>
+#include <QDBusConnection>
 // #include <QDBusConnectionInterface>
 // #include <QDBusMetaType>
-// #include <QDBusServiceWatcher>
-// #include <albert/logging.h>
-// #include <albert/matcher.h>
-// #include <albert/standarditem.h>
+#include <QDBusServiceWatcher>
 using namespace Qt::StringLiterals;
-using namespace albert::detail;
-// using namespace albert;
 using namespace std;
 
 struct Plugin::Private
@@ -20,7 +15,6 @@ struct Plugin::Private
         QDBusConnection::sessionBus(),
         QDBusServiceWatcher::WatchForOwnerChange
     };
-
 };
 
 

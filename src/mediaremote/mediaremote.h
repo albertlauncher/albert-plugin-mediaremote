@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2025 Manuel Schneider
+// https://github.com/khangthk/SketchyBar/blob/5b7d0e07cf41ae8413393b1bb8f5c184a6615695/src/media.m
+
 #pragma once
 #include <objc/runtime.h>
 #include <Foundation/Foundation.h>

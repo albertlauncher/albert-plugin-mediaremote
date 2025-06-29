@@ -1,14 +1,15 @@
 // Copyright (c) 2017-2025 Manuel Schneider
 
 #pragma once
-#include "mpris.h"
 #include <QString>
+#include <objc/runtime.h>
 
 class Player
 {
 public:
 
-    Player(const QString &service_name);
+    Player(int pid);
+    ~Player();
 
     QString name() const;
     QString iconUrl() const;
@@ -26,12 +27,11 @@ public:
 
 private:
 
-    QString dbus_service_name;
+    bool is_playing_;
     QString name_;
     QString icon_url_;
-    bool is_playing_;
-    OrgMprisMediaPlayer2Interface player;
-    OrgMprisMediaPlayer2PlayerInterface control;
+    ::id notificationObservation_;
 
 };
+
 

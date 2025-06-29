@@ -36,6 +36,20 @@ static QStringList composedIcon(QString player_icon_url, const QString &control_
 
 vector<RankItem> Plugin::handleGlobalQuery(const Query &query)
 {
+    struct {
+        QString play     = u"Play"_s;
+        QString pause    = u"Pause"_s;
+        QString next     = u"Next"_s;
+        QString previous = u"Previous"_s;
+    } static const strings;
+
+    struct {
+        QString play     = tr("Play");
+        QString pause    = tr("Pause");
+        QString next     = tr("Next");
+        QString previous = tr("Previous");
+    } static const tr_strings;
+
     Matcher matcher(query);
     vector<RankItem> results;
 
@@ -80,12 +94,4 @@ vector<RankItem> Plugin::handleGlobalQuery(const Query &query)
     }
 
     return results;
-}
-
-QWidget *Plugin::buildConfigWidget()
-{
-    auto *w = new QWidget();
-    Ui::ConfigWidget ui;
-    ui.setupUi(w);
-    return w;
 }

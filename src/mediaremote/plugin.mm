@@ -1,24 +1,13 @@
-// Copyright (c) 2017-2024 Manuel Schneider
-
-// https://github.com/khangthk/SketchyBar/blob/5b7d0e07cf41ae8413393b1bb8f5c184a6615695/src/media.m
+// Copyright (c) 2017-2025 Manuel Schneider
 
 #include "mediaremote.h"
 #include "plugin.h"
-#include <Foundation/Foundation.h>
-#include <albert/logging.h>
-#include <objc/runtime.h>
-#include <AppKit/AppKit.h>
-using namespace albert;
 using namespace std;
 #if  ! __has_feature(objc_arc)
 #error This file must be compiled with ARC.
 #endif
 
-struct Plugin::Private
-{
-public:
-
-};
+struct Plugin::Private {};
 
 Plugin::Plugin() : d(make_unique<Private>())
 {
@@ -28,7 +17,7 @@ Plugin::Plugin() : d(make_unique<Private>())
         players_.clear();
         if (pid != 0)
         {
-            auto player = make_unique<Player>(pid);
+            auto player = make_shared<Player>(pid);
             players_.emplace(player->name(), ::move(player));
         }
     };
