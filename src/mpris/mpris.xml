@@ -1,6 +1,6 @@
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node>
-<!--
+
     <interface name="org.freedesktop.DBus.Properties">
         <method name="Get">
             <arg type="s" name="interface_name" direction="in"/>
@@ -24,7 +24,6 @@
             <annotation name="org.qtproject.QtDBus.QtTypeName.Out1" value="QVariantMap" />
         </signal>
     </interface>
--->
 
     <interface name="org.mpris.MediaPlayer2">
         <property name="Identity" type="s" access="read"/>

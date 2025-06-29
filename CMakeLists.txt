@@ -28,6 +28,8 @@ if(APPLE)
         src/mediaremote/*.mm
     )
 
+    albert_plugin_include_directories(PRIVATE src/mediaremote)
+
 elseif(UNIX)
 
     albert_plugin_link_qt(DBus VERSION 6.0 REQUIRED)

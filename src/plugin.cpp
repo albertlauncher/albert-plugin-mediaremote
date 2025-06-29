@@ -4,28 +4,13 @@
 #include "ui_configwidget.h"
 #include <albert/logging.h>
 #include <albert/matcher.h>
-#include <albert/pluginloader.h>
-#include <albert/pluginmetadata.h>
 #include <albert/standarditem.h>
 #include <QUrl>
 ALBERT_LOGGING_CATEGORY("mediaplayerremote")
 using namespace Qt::StringLiterals;
-using namespace albert::plugin;
 using namespace albert::util;
 using namespace albert;
 using namespace std;
-
-namespace albert::plugin::mediaremote {
-IPlugin::~IPlugin() = default;
-}
-
-QString Plugin::id() const { return loader().metadata().id; }
-
-QString Plugin::name() const { return loader().metadata().name; }
-
-QString Plugin::description() const { return loader().metadata().description; }
-
-vector<Extension *> Plugin::extensions() { return {this}; }
 
 static inline shared_ptr<Item> makeItem(const QString &cmd,
                                         const QString &player_name,
@@ -123,6 +108,3 @@ QWidget *Plugin::buildConfigWidget()
     ui.setupUi(w);
     return w;
 }
-
-const std::map<QString, std::unique_ptr<albert::plugin::mediaremote::IPlayer>> &Plugin::players()
-{ return players_; }

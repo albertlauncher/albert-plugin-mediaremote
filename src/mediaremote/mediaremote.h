@@ -4,11 +4,11 @@
 
 extern "C" {
 
+extern NSString* kMRMediaRemoteNowPlayingApplicationDidChangeNotification;
+extern NSString* kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification;
 extern NSString* kMRMediaRemoteNowPlayingInfoDidChangeNotification;
 extern NSString* kMRMediaRemoteNowPlayingPlaybackQueueDidChangeNotification;
 extern NSString* kMRMediaRemotePickableRoutesDidChangeNotification;
-extern NSString* kMRMediaRemoteNowPlayingApplicationDidChangeNotification;
-extern NSString* kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification;
 extern NSString* kMRMediaRemoteRouteStatusDidChangeNotification;
 
 extern NSString* kMRMediaRemoteNowPlayingApplicationPIDUserInfoKey;
