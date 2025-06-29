@@ -39,61 +39,42 @@ vector<RankItem> Plugin::handleGlobalQuery(const Query &query)
     Matcher matcher(query);
     vector<RankItem> results;
 
-    for (const auto &player : players_)
+    for (const auto &[_, p] : players_)
     {
-        auto &p = *player.second;
-
-        if (auto m = matcher.match(strings.next, tr_strings.next, p.name());
-            m && p.canGoNext())
+        if (auto m = matcher.match(strings.next, tr_strings.next, p->name());
+            m && p->canGoNext())
             results.emplace_back(makeItem(tr_strings.next,
-                                          p.name(),
-                                          composedIcon(p.iconUrl(), u"⏭️"_s),
-                                          [this, pid = p.name()] {
-                                              if (auto it = players_.find(pid); it != players_.end())
-                                                  it->second->next();
-                                          }),
+                                          p->name(),
+                                          composedIcon(p->iconUrl(), u"⏭️"_s),
+                                          [=] { p->next(); }),
                                  m);
 
-        if (auto m = matcher.match(strings.previous, tr_strings.previous, p.name());
-            m && p.canGoPrevious())
+        if (auto m = matcher.match(strings.previous, tr_strings.previous, p->name());
+            m && p->canGoPrevious())
             results.emplace_back(makeItem(tr_strings.previous,
-                                          p.name(),
-                                          composedIcon(p.iconUrl(), u"⏮️"_s),
-                                          [this, pid=p.name()] {
-                                              if (auto it = players_.find(pid);
-                                                  it != players_.end())
-                                                  it->second->previous();
-                                          }),
+                                          p->name(),
+                                          composedIcon(p->iconUrl(), u"⏮️"_s),
+                                          [=] { p->previous(); }),
                                  m);
 
-        if (p.isPlaying())
+        if (p->isPlaying())
         {
-            if (auto m = matcher.match(strings.pause, tr_strings.pause, p.name());
-                m && p.canPause())
+            if (auto m = matcher.match(strings.pause, tr_strings.pause, p->name());
+                m && p->canPause())
                 results.emplace_back(makeItem(tr_strings.pause,
-                                              p.name(),
-                                              composedIcon(p.iconUrl(), u"⏸️"_s),
-                                              [this, pid=p.name()]
-                                              {
-                                                  if (auto it = players_.find(pid);
-                                                      it != players_.end())
-                                                      it->second->pause();
-                                              }),
+                                              p->name(),
+                                              composedIcon(p->iconUrl(), u"⏸️"_s),
+                                              [=] { p->pause(); }),
                                      m);
         }
         else
         {
-            if (auto m = matcher.match(strings.play, tr_strings.play, p.name());
-                m && p.canPlay())
+            if (auto m = matcher.match(strings.play, tr_strings.play, p->name());
+                m && p->canPlay())
                 results.emplace_back(makeItem(tr_strings.play,
-                                              p.name(),
-                                              composedIcon(p.iconUrl(), u"▶️"_s),
-                                              [this, pid=p.name()]
-                                              {
-                                                  if (auto it = players_.find(pid);
-                                                      it != players_.end())
-                                                      it->second->play();
-                                              }),
+                                              p->name(),
+                                              composedIcon(p->iconUrl(), u"▶️"_s),
+                                              [=] { p->play(); }),
                                      m);
         }
     }
