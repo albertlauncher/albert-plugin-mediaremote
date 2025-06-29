@@ -1,7 +1,6 @@
 // Copyright (c) 2017-2025 Manuel Schneider
 
 #include "plugin.h"
-#include "ui_configwidget.h"
 #include <albert/logging.h>
 #include <albert/matcher.h>
 #include <albert/standarditem.h>
@@ -52,6 +51,7 @@ vector<RankItem> Plugin::handleGlobalQuery(const Query &query)
 
     Matcher matcher(query);
     vector<RankItem> results;
+    shared_lock lock(players_mtx_);
 
     for (const auto &[_, p] : players_)
     {

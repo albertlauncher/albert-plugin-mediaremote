@@ -2,7 +2,7 @@
 
 ## Features
 
-- Control playback with 'Play', 'Pause', 'Next', 'Previous' items.
+- Control playback of active players with 'Play', 'Pause', 'Next', 'Previous' items.
 - Items match player name and localized and english titles.
 
 ## Platforms

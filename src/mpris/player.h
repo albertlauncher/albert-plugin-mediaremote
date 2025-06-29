@@ -27,11 +27,10 @@ public:
 private:
 
     QString dbus_service_name;
-    QString name_;
-    QString icon_url_;
-    bool is_playing_;
     OrgMprisMediaPlayer2Interface player;
     OrgMprisMediaPlayer2PlayerInterface control;
+    QString name_;
+    QString icon_url_;
 
 };
 

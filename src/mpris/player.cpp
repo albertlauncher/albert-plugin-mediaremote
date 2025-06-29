@@ -2,7 +2,6 @@
 
 #include "mpris.h"
 #include "player.h"
-#include <albert/logging.h>
 #include <albert/desktopentryparser.h>
 using namespace Qt::StringLiterals;
 
@@ -52,25 +51,7 @@ QString Player::name() const { return name_; }
 
 QString Player::iconUrl() const  { return icon_url_; }
 
-bool Player::isPlaying() const {
-    //     enum PlaybackStatus { Playing, Paused, Stopped };
-    //     static const QString playback_status_strings[] = {
-    //         Plugin::tr("Playing"),
-    //         Plugin::tr("Paused"),
-    //         Plugin::tr("Stopped")
-    //     };
-    //     PlaybackStatus playback_status = Stopped;
-    //     if (control.playbackStatus() == QStringLiteral("Playing"))
-    //         playback_status = Playing;
-    //     else if (control.playbackStatus() == QStringLiteral("Paused"))
-    //         playback_status = Paused;
-    //     else if (control.playbackStatus() == QStringLiteral("Stopped"))
-    //         playback_status = Stopped;
-    //     else
-    //         WARN << "Invalid playback status received:" << control.playbackStatus();
-    //     return playback_status == Playing;
-    return control.playbackStatus() == QStringLiteral("Playing");
-}
+bool Player::isPlaying() const { return control.playbackStatus() == u"Playing"_s; }
 
 bool Player::canPlay() const { return control.canPlay(); }
 

@@ -1,9 +1,10 @@
 // Copyright (c) 2017-2025 Manuel Schneider
 
 #pragma once
+#include "player.h"
 #include <albert/extensionplugin.h>
 #include <albert/globalqueryhandler.h>
-#include "player.h"
+#include <shared_mutex>
 
 // Expected player interface
 // class Player
@@ -36,6 +37,7 @@ public:
 
 protected:
 
+    std::shared_mutex players_mtx_;
     std::map<QString, std::shared_ptr<Player>> players_;
 
     struct Private;

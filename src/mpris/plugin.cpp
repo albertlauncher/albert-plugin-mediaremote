@@ -1,9 +1,7 @@
-// Copyright (c) 2017-2024 Manuel Schneider
+// Copyright (c) 2017-2025 Manuel Schneider
 
 #include "plugin.h"
 #include <QDBusConnection>
-// #include <QDBusConnectionInterface>
-// #include <QDBusMetaType>
 #include <QDBusServiceWatcher>
 using namespace Qt::StringLiterals;
 using namespace std;
@@ -25,13 +23,14 @@ Plugin::Plugin() : d(make_unique<Private>())
 
     connect(&d->service_watcher, &QDBusServiceWatcher::serviceOwnerChanged, this,
             [this](const QString &service, const QString &, const QString &new_owner){
+        scoped_lock lock(players_mtx_);
         if (new_owner.isEmpty())
             players_.erase(service);
         else if (auto it = players_.find(service);
                  it == players_.end())
-            players_.emplace(service, make_unique<Player>(service));
+            players_.emplace(service, make_shared<Player>(service));
         else
-            it->second = make_unique<Player>(service);
+            it->second = make_shared<Player>(service);
     });
 
     // Each media player must request a unique bus name which begins with org.mpris.MediaPlayer2
@@ -41,7 +40,7 @@ Plugin::Plugin() : d(make_unique<Private>())
     else
         for (const auto &service : reply.value())
             if (service.startsWith(u"org.mpris.MediaPlayer2."_s))
-                players_.emplace(service, make_unique<Player>(service));
+                players_.emplace(service, make_shared<Player>(service));
 }
 
 Plugin::~Plugin() = default;
