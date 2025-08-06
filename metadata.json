@@ -3,6 +3,7 @@
     "description": "Control media players",
     "description[de]": "Mediaplayer steuern",
     "license": "MIT",
+    "maintainers": ["@manuelschneid3r"],
     "name": "Media player remote",
     "name[de]": "Mediaplayersteuerung",
     "url": "https://github.com/albertlauncher/albert-plugin-mediaremote",
