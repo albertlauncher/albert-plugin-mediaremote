@@ -1,4 +1,4 @@
-# albert-plugin-mediaremote
+# Albert plugin: Media player remote
 
 ## Features
 
