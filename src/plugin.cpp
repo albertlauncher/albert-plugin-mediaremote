@@ -3,8 +3,8 @@
 #include "plugin.h"
 #include <albert/logging.h>
 #include <albert/matcher.h>
+#include <albert/networkutil.h>
 #include <albert/standarditem.h>
-#include <QUrl>
 ALBERT_LOGGING_CATEGORY("mediaplayerremote")
 using namespace Qt::StringLiterals;
 using namespace albert::util;
@@ -28,8 +28,8 @@ static QStringList composedIcon(QString player_icon_url, const QString &control_
 {
     return {
         u"comp:?src1=%1&src2=%2&size1=0.9&size2=0.6"_s
-            .arg(QString::fromUtf8(QUrl::toPercentEncoding(player_icon_url)),
-                 QString::fromUtf8(QUrl::toPercentEncoding(u"gen:?text="_s + control_emoji)))
+            .arg(percentEncoded(player_icon_url),
+                 percentEncoded(u"gen:?text="_s + control_emoji))
     };
 }
 
