@@ -3,6 +3,8 @@
 #pragma once
 #include <QString>
 #include <objc/runtime.h>
+#include <memory>
+namespace albert { class Icon; }
 
 class Player
 {
@@ -12,7 +14,7 @@ public:
     ~Player();
 
     QString name() const;
-    QString iconUrl() const;
+    std::unique_ptr<albert::Icon> icon();
 
     bool isPlaying() const;
     bool canPlay() const;
@@ -29,8 +31,8 @@ private:
 
     bool is_playing_;
     QString name_;
-    QString icon_url_;
-    ::id notificationObservation_;
+    QString bundle_path_;
+    ::id notification_observation_;
 
 };
 

@@ -4,7 +4,10 @@
 #include "mpris.h"
 #include "player.h"
 #include <albert/desktopentryparser.h>
+#include <albert/iconutil.h>
 using namespace Qt::StringLiterals;
+using namespace albert;
+using namespace std;
 
 static const auto dbus_timeout = 100;
 static const auto dbus_object_path = u"/org/mpris/MediaPlayer2"_s;
@@ -30,18 +33,18 @@ Player::Player(const QString &service_name):
     if (const auto file_path = getDesktopEntry(player.desktopEntry());
         file_path.isEmpty())
     {
-        name_ = player.desktopEntry();
-        icon_url_ = u"xdg:multimedia-player"_s;
+        name_ = player.identity();
+        icon_factory_ = []{ return makeThemeIcon(u"multimedia-player"_s); };
     }
     else
     {
-        albert::detail::DesktopEntryParser desktop_entry(file_path);
+        detail::DesktopEntryParser desktop_entry(file_path);
         name_ = desktop_entry.getLocaleString(u"Desktop Entry"_s, u"Name"_s);
         if (const auto icon_string = desktop_entry.getIconString(u"Desktop Entry"_s, u"Icon"_s);
             QFile::exists(icon_string))
-            icon_url_ = u"file:"_s + icon_string;
+            icon_factory_ = [=]{ return makeImageIcon(icon_string); };
         else
-            icon_url_ = u"xdg:"_s + icon_string;
+            icon_factory_ = [=]{ return makeThemeIcon(icon_string); };
     }
 
     player.setTimeout(dbus_timeout);
@@ -50,7 +53,7 @@ Player::Player(const QString &service_name):
 
 QString Player::name() const { return name_; }
 
-QString Player::iconUrl() const  { return icon_url_; }
+unique_ptr<Icon> Player::icon() { return icon_factory_(); }
 
 bool Player::isPlaying() const { return control.playbackStatus() == u"Playing"_s; }
 

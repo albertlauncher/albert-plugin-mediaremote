@@ -1,8 +1,9 @@
 // Copyright (c) 2017-2025 Manuel Schneider
 
-#include "player.h"
 #include "mediaremote.h"
+#include "player.h"
 #include <AppKit/AppKit.h>
+#include <albert/iconutil.h>
 #include <albert/logging.h>
 #if  ! __has_feature(objc_arc)
 #error This file must be compiled with ARC.
@@ -18,17 +19,14 @@ Player::Player(int pid)
     }
 
     name_ = QString::fromNSString(app.localizedName);
-
-    NSURL *bundleURL = app.bundleURL;
-    NSString *bundlePath = bundleURL.path;
-    icon_url_ = u"qfip:" + QString::fromNSString(bundlePath);
+    bundle_path_ = QString::fromNSString(app.bundleURL.path);
 
     // Initialize is_playing_
     MRMediaRemoteGetNowPlayingApplicationIsPlaying(dispatch_get_main_queue(),
                                                    ^(Boolean isPlaying) { is_playing_ = isPlaying; });
 
     // Watch is_playing_
-    notificationObservation_ = [[NSNotificationCenter defaultCenter]
+    notification_observation_ = [[NSNotificationCenter defaultCenter]
         addObserverForName:(__bridge NSString*)kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification
                     object:nil
                      queue:[NSOperationQueue mainQueue]
@@ -39,11 +37,11 @@ Player::Player(int pid)
                 }];
 }
 
-Player::~Player() { [[NSNotificationCenter defaultCenter] removeObserver:notificationObservation_]; }
+Player::~Player() { [[NSNotificationCenter defaultCenter] removeObserver:notification_observation_]; }
 
 QString Player::name() const { return name_; }
 
-QString Player::iconUrl() const { return icon_url_; }
+std::unique_ptr<albert::Icon> Player::icon() { return albert::makeFileTypeIcon(bundle_path_); }
 
 bool Player::isPlaying() const { return is_playing_; }
 
