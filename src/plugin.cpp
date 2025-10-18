@@ -8,7 +8,6 @@
 #include <albert/standarditem.h>
 ALBERT_LOGGING_CATEGORY("mediaplayerremote")
 using namespace Qt::StringLiterals;
-using namespace albert::util;
 using namespace albert;
 using namespace std;
 
@@ -24,7 +23,7 @@ static inline shared_ptr<Item> makeItem(Player &player,
     return StandardItem::make(cmd, tr_cmd, player.name(), ::move(ico_fac), {{cmd, tr_cmd, ::move(action)}});
 }
 
-vector<RankItem> Plugin::handleGlobalQuery(const Query &query)
+vector<RankItem> Plugin::rankItems(QueryContext &ctx)
 {
     struct {
         QString play     = u"Play"_s;
@@ -40,7 +39,7 @@ vector<RankItem> Plugin::handleGlobalQuery(const Query &query)
         QString previous = tr("Previous");
     } static const tr_strings;
 
-    Matcher matcher(query);
+    Matcher matcher(ctx);
     vector<RankItem> results;
     shared_lock lock(players_mtx_);
 
