@@ -3,7 +3,7 @@
 #include "mediaremote.h"
 #include "player.h"
 #include <AppKit/AppKit.h>
-#include <albert/iconutil.h>
+#include <albert/icon.h>
 #include <albert/logging.h>
 #if  ! __has_feature(objc_arc)
 #error This file must be compiled with ARC.
@@ -41,7 +41,7 @@ Player::~Player() { [[NSNotificationCenter defaultCenter] removeObserver:notific
 
 QString Player::name() const { return name_; }
 
-std::unique_ptr<albert::Icon> Player::icon() { return albert::makeFileTypeIcon(bundle_path_); }
+std::unique_ptr<albert::Icon> Player::icon() { return albert::Icon::fileType(bundle_path_); }
 
 bool Player::isPlaying() const { return is_playing_; }
 

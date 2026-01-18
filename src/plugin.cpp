@@ -1,10 +1,10 @@
 // Copyright (c) 2017-2025 Manuel Schneider
 
 #include "plugin.h"
+#include <albert/icon.h>
 #include <albert/logging.h>
 #include <albert/matcher.h>
 #include <albert/networkutil.h>
-#include <albert/iconutil.h>
 #include <albert/standarditem.h>
 ALBERT_LOGGING_CATEGORY("mediaplayerremote")
 using namespace Qt::StringLiterals;
@@ -19,7 +19,7 @@ static inline shared_ptr<Item> makeItem(Player &player,
                                         const QString &grapheme,
                                         function<void()> &&action)
 {
-    auto ico_fac = [p=&player, g=grapheme]{ return makeComposedIcon(p->icon(), makeGraphemeIcon(g), .9, .6); };
+    auto ico_fac = [p=&player, g=grapheme]{ return Icon::composed(p->icon(), Icon::grapheme(g), .9, .6); };
     return StandardItem::make(cmd, tr_cmd, player.name(), ::move(ico_fac), {{cmd, tr_cmd, ::move(action)}});
 }
 

@@ -4,7 +4,7 @@
 #include "mpris.h"
 #include "player.h"
 #include <albert/desktopentryparser.h>
-#include <albert/iconutil.h>
+#include <albert/icon.h>
 using namespace Qt::StringLiterals;
 using namespace albert;
 using namespace std;
@@ -34,7 +34,7 @@ Player::Player(const QString &service_name):
         file_path.isEmpty())
     {
         name_ = player.identity();
-        icon_factory_ = []{ return makeThemeIcon(u"multimedia-player"_s); };
+        icon_factory_ = []{ return Icon::theme(u"multimedia-player"_s); };
     }
     else
     {
@@ -42,9 +42,9 @@ Player::Player(const QString &service_name):
         name_ = desktop_entry.getLocaleString(u"Desktop Entry"_s, u"Name"_s);
         if (const auto icon_string = desktop_entry.getIconString(u"Desktop Entry"_s, u"Icon"_s);
             QFile::exists(icon_string))
-            icon_factory_ = [=]{ return makeImageIcon(icon_string); };
+            icon_factory_ = [=]{ return Icon::image(icon_string); };
         else
-            icon_factory_ = [=]{ return makeThemeIcon(icon_string); };
+            icon_factory_ = [=]{ return Icon::theme(icon_string); };
     }
 
     player.setTimeout(dbus_timeout);
