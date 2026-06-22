@@ -33,7 +33,7 @@ public:
     Plugin();
     ~Plugin();
 
-    std::vector<albert::RankItem> rankItems(albert::QueryContext &) override;
+    std::vector<albert::RankItem> rankItems(albert::QueryContext) override;
 
 protected:
 

@@ -23,7 +23,7 @@ static inline shared_ptr<Item> makeItem(Player &player,
     return StandardItem::make(cmd, tr_cmd, player.name(), ::move(ico_fac), {{cmd, tr_cmd, ::move(action)}});
 }
 
-vector<RankItem> Plugin::rankItems(QueryContext &ctx)
+vector<RankItem> Plugin::rankItems(QueryContext ctx)
 {
     struct {
         QString play     = u"Play"_s;
