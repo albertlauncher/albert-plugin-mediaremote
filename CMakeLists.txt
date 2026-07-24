@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(mediaremote VERSION 7.0.2)
+project(mediaremote VERSION 7.1.0)
 
 find_package(Albert REQUIRED)
 
